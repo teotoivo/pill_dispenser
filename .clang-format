@@ -1,0 +1,13 @@
+BasedOnStyle: Google
+IndentWidth: 4
+TabWidth: 4
+UseTab: Always
+ColumnLimit: 80
+AlignAfterOpenBracket: Align
+AllowShortIfStatementsOnASingleLine: false
+BreakBeforeBraces: Allman
+SpaceBeforeParens: ControlStatements
+SpaceAfterCStyleCast: true
+
+SpacesInParentheses: false
+AlignConsecutiveAssignments: true

@@ -1,0 +1,11 @@
+# Build artifacts
+/build/
+*.o
+*.out
+*.exe
+
+# IDE-specific files
+.vscode/
+.idea/
+.cache/
+.clangd
