@@ -3,6 +3,9 @@
 
 #include <hardware/i2c.h>
 
+#define LED_COUNT 3
+#define BUTTON_COUNT 3
+
 #define LED_D3 20
 #define LED_D2 21
 #define LED_D1 22
