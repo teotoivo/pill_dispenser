@@ -2,6 +2,7 @@
 #define STEPPER_MOTOR_H
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #include "program_state.h"
 
