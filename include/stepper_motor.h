@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#include "globals.h"
+#include "program_state.h"
 
 #define CALIBRATION_RUNS 1
 

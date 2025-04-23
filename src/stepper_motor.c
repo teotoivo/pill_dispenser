@@ -6,8 +6,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "globals.h"
 #include "hardware_definitions.h"
+#include "program_state.h"
 
 // Half-step sequence for the stepper motor
 static const uint8_t STEP_SEQUENCE[8][4] = {
@@ -54,7 +54,8 @@ void init_stepper_motor(ProgramState *program_state)
 void calibarate_stepper_motor(ProgramState *program_state)
 {
 	printf("Calibrating\n");
-	// TODO mark in eeprom that morot is running
+	program_state->is_running = 1;
+	write_program_state(program_state);
 
 	// clear the event que before calibration
 	int event;
@@ -89,13 +90,18 @@ void calibarate_stepper_motor(ProgramState *program_state)
 	program_state->steps_per_rev =
 		total_steps / CALIBRATION_RUNS;	 // averaage over the runs
 
-	// TODO mark in eeprom that morot is not running
+	program_state->is_running = 0;
+	write_program_state(program_state);
 }
 
 void run_stepper_steps(ProgramState *program_state, int32_t steps_to_run,
 					   bool mark_in_eeprom)
 {
-	// TODO mark in eeprom that steper motor is running based on mark_in_eeprom
+	if (mark_in_eeprom)
+	{
+		program_state->is_running = 1;
+		write_program_state(program_state);
+	}
 
 	const int32_t SLEEP_DELAY = 1000;  // the speed the motor runs at
 	if (steps_to_run > 0)
@@ -132,8 +138,12 @@ void run_stepper_steps(ProgramState *program_state, int32_t steps_to_run,
 		}
 	}
 
-	// TODO mark in eeprom that stepper motor has stopped running based on
 	// mark_in_eeprom
+	if (mark_in_eeprom)
+	{
+		program_state->is_running = 0;
+		write_program_state(program_state);
+	}
 }
 
 void opto_fork_interrupt_callback(uint32_t event_mask)
