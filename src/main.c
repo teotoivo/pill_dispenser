@@ -4,8 +4,9 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-#include "globals.h"
+#include "eeprom.h"
 #include "hardware_definitions.h"
+#include "program_state.h"
 #include "stepper_motor.h"
 #include "utils.h"
 
@@ -35,6 +36,11 @@ int main()
 
 	// add intit functions here
 	init_stepper_motor(&program_state);
+	i2c_init_custom(EEPROM_PORT, EEPROM_sda_pin, EEPROM_scl_pin,
+					EEPROM_BAUD_RATE);
+
+	// dont move this
+	load_program_state(&program_state);
 
 	while (true)
 	{

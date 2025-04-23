@@ -34,3 +34,15 @@ uint8_t eeprom_read_byte(uint16_t memory_address)
 
 	return result;
 }
+
+uint16_t eeprom_read_u16(uint16_t addr)
+{
+	uint16_t lo = eeprom_read_byte(addr);
+	uint16_t hi = eeprom_read_byte(addr + 1);
+	return (uint16_t) ((hi << 8) | lo);
+}
+void eeprom_write_u16(uint16_t addr, uint16_t value)
+{
+	eeprom_write_byte(addr, (uint8_t) (value & 0xFF));
+	eeprom_write_byte(addr + 1, (uint8_t) ((value >> 8) & 0xFF));
+}
