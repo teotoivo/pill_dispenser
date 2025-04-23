@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "globals.h"
+#include "program_state.h"
 
 #define CALIBRATION_RUNS 1
 

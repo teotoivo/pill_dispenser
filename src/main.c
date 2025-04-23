@@ -4,8 +4,9 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-#include "globals.h"
+#include "eeprom.h"
 #include "hardware_definitions.h"
+#include "program_state.h"
 #include "stepper_motor.h"
 #include "utils.h"
 #include "initial.h"
@@ -40,14 +41,23 @@ int main()
 	};
 
 	// add intit functions here
+  i2c_init_custom(EEPROM_PORT, EEPROM_sda_pin, EEPROM_scl_pin,
+					EEPROM_BAUD_RATE);
 	init_stepper_motor(&program_state);
 	init_leds(LED_COUNT);
 	init_buttons(BUTTON_COUNT);
 
-	wait_for_calibration();
+	
+
+	
+
+	// dont move this
+	load_program_state(&program_state);
+
+wait_for_calibration();
 	// add calibration function here
 	wait_for_start();
-
+  
 	while (true)
 	{
 		printf("Working\n");
