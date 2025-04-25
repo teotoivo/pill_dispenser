@@ -51,6 +51,26 @@ void init_stepper_motor(ProgramState *program_state)
 	program_state->steps_per_rev = 0;  // sets to uncalbrated
 }
 
+void reset_stepper_motor_offset(ProgramState *program_state)
+{
+	program_state->is_running = 1;
+	write_program_state(program_state);
+
+	uint8_t event;
+	while (queue_try_remove(&opto_fork_events, &event));
+
+	while (true)
+	{
+		if (queue_try_remove(&opto_fork_events, &event))
+			break;
+
+		run_stepper_steps(program_state, -1, false);
+	}
+
+	program_state->is_running = 0;
+	write_program_state(program_state);
+}
+
 void calibarate_stepper_motor(ProgramState *program_state)
 {
 	printf("Calibrating\n");
@@ -58,7 +78,7 @@ void calibarate_stepper_motor(ProgramState *program_state)
 	write_program_state(program_state);
 
 	// clear the event que before calibration
-	int event;
+	uint8_t event;
 	while (queue_try_remove(&opto_fork_events, &event));
 
 	uint32_t total_steps = 0;
@@ -150,7 +170,7 @@ void opto_fork_interrupt_callback(uint32_t event_mask)
 {
 	if ((event_mask & GPIO_IRQ_EDGE_FALL))
 	{
-		int event = 1;
+		uint8_t event = 1;
 		queue_try_add(&opto_fork_events, &event);
 	}
 }
