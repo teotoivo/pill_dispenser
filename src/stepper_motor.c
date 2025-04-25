@@ -67,13 +67,15 @@ void reset_stepper_motor_offset(ProgramState *program_state)
 		run_stepper_steps(program_state, -1, false);
 	}
 
-	program_state->is_running = 0;
+	run_stepper_steps(program_state, -150, false);
+
+	program_state->absolute_motor_position = 0;
+	program_state->is_running			   = 0;
 	write_program_state(program_state);
 }
 
 void calibarate_stepper_motor(ProgramState *program_state)
 {
-	printf("Calibrating\n");
 	program_state->is_running = 1;
 	write_program_state(program_state);
 
@@ -90,7 +92,6 @@ void calibarate_stepper_motor(ProgramState *program_state)
 		}
 		run_stepper_steps(program_state, 1, false);
 	}
-	printf("Found start\n");
 
 	for (uint16_t i = 0; i < CALIBRATION_RUNS; i++)
 	{
@@ -105,6 +106,8 @@ void calibarate_stepper_motor(ProgramState *program_state)
 		}
 		total_steps += steps;
 	}
+
+	run_stepper_steps(program_state, 150, false);  // fix offset
 
 	program_state->absolute_motor_position = 0;
 	program_state->steps_per_rev =
@@ -173,4 +176,16 @@ void opto_fork_interrupt_callback(uint32_t event_mask)
 		uint8_t event = 1;
 		queue_try_add(&opto_fork_events, &event);
 	}
+}
+
+void dispense_next_pill(ProgramState *program_state)
+{
+	program_state->is_running = 1;
+	write_program_state(program_state);
+
+	run_stepper_steps(program_state, program_state->steps_per_rev / PILL_SLOTS,
+					  false);
+
+	program_state->is_running = 0;
+	write_program_state(program_state);
 }

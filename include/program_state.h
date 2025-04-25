@@ -27,6 +27,8 @@ typedef struct ProgramState
 #define EE_ADDR_ABS_POSITION (EEPROM_MAX_ADDRESS - 7)  /* 0x7FF8 */
 #define EE_ADDR_IS_RUNNING (EEPROM_MAX_ADDRESS - 9)	   /* 0x7FF6 */
 
+#define PILL_SLOTS 8  // first one is always empty
+
 void load_program_state(ProgramState* program_state);
 void write_program_state(ProgramState* program_state);
 
