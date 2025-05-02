@@ -37,9 +37,7 @@ int main()
 	gpio_set_irq_enabled_with_callback(SW_1, GPIO_IRQ_EDGE_RISE, true,
 									   &irq_callback);
 
-	ProgramState program_state = {
-		.steps_per_rev = 0,
-	};
+	ProgramState program_state;
 
 	// add intit functions here
 	i2c_init_custom(EEPROM_PORT, EEPROM_sda_pin, EEPROM_scl_pin,

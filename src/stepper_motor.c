@@ -8,6 +8,7 @@
 
 #include "hardware_definitions.h"
 #include "program_state.h"
+#include "utils.h"
 
 // Half-step sequence for the stepper motor
 static const uint8_t STEP_SEQUENCE[8][4] = {
@@ -46,9 +47,6 @@ void init_stepper_motor(ProgramState *program_state)
 	init_stepper_pin(STEPPER_CONTROLLER_3);
 
 	queue_init(&opto_fork_events, sizeof(uint8_t), 20);
-
-	// TODO CHECK IF IT IS ALLREADY CALIBRATED
-	program_state->steps_per_rev = 0;  // sets to uncalbrated
 }
 
 void reset_stepper_motor_offset(ProgramState *program_state)
@@ -62,7 +60,9 @@ void reset_stepper_motor_offset(ProgramState *program_state)
 	while (true)
 	{
 		if (queue_try_remove(&opto_fork_events, &event))
+		{
 			break;
+		}
 
 		run_stepper_steps(program_state, -1, false);
 	}
@@ -72,6 +72,13 @@ void reset_stepper_motor_offset(ProgramState *program_state)
 	program_state->absolute_motor_position = 0;
 	program_state->is_running			   = 0;
 	write_program_state(program_state);
+
+	uint8_t right_state			= program_state->current_pill;
+	program_state->current_pill = 0;
+	while (program_state->current_pill < right_state)
+	{
+		dispense_next_pill(program_state);
+	}
 }
 
 void calibarate_stepper_motor(ProgramState *program_state)
@@ -110,6 +117,7 @@ void calibarate_stepper_motor(ProgramState *program_state)
 	run_stepper_steps(program_state, 150, false);  // fix offset
 
 	program_state->absolute_motor_position = 0;
+	program_state->current_pill			   = 0;
 	program_state->steps_per_rev =
 		total_steps / CALIBRATION_RUNS;	 // averaage over the runs
 
@@ -148,7 +156,7 @@ void run_stepper_steps(ProgramState *program_state, int32_t steps_to_run,
 		for (int i = 0; i < labs(steps_to_run); i++)
 		{
 			microstep_index = (microstep_index - 1 + 8) % 8;
-			program_state->steps_per_rev =
+			program_state->absolute_motor_position =
 				(program_state->absolute_motor_position - 1 +
 				 program_state->steps_per_rev) %
 				program_state->steps_per_rev;
@@ -185,6 +193,18 @@ void dispense_next_pill(ProgramState *program_state)
 
 	run_stepper_steps(program_state, program_state->steps_per_rev / PILL_SLOTS,
 					  false);
+
+	program_state->current_pill += 1;
+	if (program_state->current_pill == PILL_SLOTS - 1)
+	{
+		program_state->current_pill			   = 0;
+		program_state->is_running			   = 0;
+		program_state->absolute_motor_position = 0;
+		program_state->steps_per_rev		   = 0;
+		printf("restart\n");
+		write_program_state(program_state);
+		restart_board();
+	}
 
 	program_state->is_running = 0;
 	write_program_state(program_state);

@@ -6,6 +6,7 @@ typedef struct ProgramState
 	uint16_t steps_per_rev;
 	uint16_t absolute_motor_position;
 	uint8_t is_running;	 // 0 for no 1 for yes
+	uint8_t current_pill;
 } ProgramState;
 
 /* --------------------------------------------------------------------
@@ -21,11 +22,14 @@ typedef struct ProgramState
  * 0x7FF8  ┘
  * 0x7FF7  is_running            (1 byte)
  * 0x7FF6  ~is_running           (1 byte)
+ * 0x7FF5  current_pill          (1 byte)
+ * 0x7FF4  ~current_pill         (1 byte)
  * ------------------------------------------------------------------ */
 
 #define EE_ADDR_STEPS_PER_REV (EEPROM_MAX_ADDRESS - 3) /* 0x7FFC */
 #define EE_ADDR_ABS_POSITION (EEPROM_MAX_ADDRESS - 7)  /* 0x7FF8 */
 #define EE_ADDR_IS_RUNNING (EEPROM_MAX_ADDRESS - 9)	   /* 0x7FF6 */
+#define EE_ADDR_CURRENT_PILL (EEPROM_MAX_ADDRESS - 11) /* 0x7FF4 */
 
 #define PILL_SLOTS 8  // first one is always empty
 
