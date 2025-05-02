@@ -3,6 +3,8 @@
 
 #include <hardware/i2c.h>
 
+#define BAUD_RATE 9600
+
 #define LED_COUNT 3
 #define BUTTON_COUNT 3
 
