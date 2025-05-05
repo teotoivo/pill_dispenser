@@ -11,4 +11,6 @@ void i2c_init_custom(i2c_inst_t *i2c, uint16_t sda_pin, uint16_t scl_pin,
 					 uint32_t baudrate);
 void clear_terminal();
 bool get_user_input(char *input, size_t input_size);
+char *str_concat(const char *str1, const char *str2);
+
 #endif
