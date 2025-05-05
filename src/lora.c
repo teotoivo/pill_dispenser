@@ -124,7 +124,7 @@ bool connect_to_lora_module()
         }
     }
 
-    for (size_t i = 0; i < CONNECTION_COMMAND_COUNT; i++) {
+    for (uint8_t i = 0; i < CONNECTION_COMMAND_COUNT; i++) {
         free(connectiond_cmds[i].command);
     }
     
