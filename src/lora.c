@@ -77,7 +77,7 @@ bool connect_to_lora_module()
     char *port_command = str_concat("AT+PORT=", LORA_PORT);
     char *join_command = str_concat("AT+JOIN", "");
 
-    const LoraCommand CONNECTION_CMDS[CONNECTION_COMMAND_COUNT] = {
+    LoraCommand connectiond_cmds[CONNECTION_COMMAND_COUNT] = {
         { at_command, "+AT: OK", 500 },
         { mode_command, "+MODE",  500 },
         { key_command, "+KEY: APPKEY", 500 },
@@ -93,20 +93,20 @@ bool connect_to_lora_module()
 
     while (curr_cmd_i < CONNECTION_COMMAND_COUNT)
     {
-        if (!CONNECTION_CMDS[curr_cmd_i].command) {
+        if (!connectiond_cmds[curr_cmd_i].command) {
             connection_succeeded = false;
             break;
         }
 
         char res[MAX_RESULT_SIZE];
 
-        printf("Sending: %s\n", CONNECTION_CMDS[curr_cmd_i].command);
+        printf("Sending: %s\n", connectiond_cmds[curr_cmd_i].command);
 
         connection_succeeded = send_command(
-            CONNECTION_CMDS[curr_cmd_i].command,
-            CONNECTION_CMDS[curr_cmd_i].result,
+            connectiond_cmds[curr_cmd_i].command,
+            connectiond_cmds[curr_cmd_i].result,
             res,
-            CONNECTION_CMDS[curr_cmd_i].timeout_ms
+            connectiond_cmds[curr_cmd_i].timeout_ms
         );
 
         if (connection_succeeded) {
@@ -125,7 +125,7 @@ bool connect_to_lora_module()
     }
 
     for (size_t i = 0; i < CONNECTION_COMMAND_COUNT; i++) {
-        free(CONNECTION_CMDS[i].command);
+        free(connectiond_cmds[i].command);
     }
     
     return connection_succeeded;
