@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include "pico/stdlib.h"
 
 /*
@@ -14,6 +15,7 @@
 #include "lora_api_key.h"
 #include "lora.h"
 #include "hardware_definitions.h"
+#include "utils.h"
 
 typedef struct LoraCommand {
     char *command;
@@ -68,23 +70,14 @@ bool connect_to_lora_module()
 
     gpio_pull_up(UART_RX_PIN);
 
-    char at_command[MAX_RESULT_SIZE] = "AT";
-    char mode_command[MAX_RESULT_SIZE] = "AT+MODE=";
-    char key_command[MAX_RESULT_SIZE] = "AT+KEY=APPKEY,";
-    char class_command[MAX_RESULT_SIZE] = "AT+CLASS=";
-    char port_command[MAX_RESULT_SIZE] = "AT+PORT=";
-    char join_command[MAX_RESULT_SIZE] = "AT+JOIN";
+    char *at_command = str_concat("AT", "");
+    char *mode_command = str_concat("AT+MODE=", LORA_MODE);
+    char *key_command = str_concat("AT+KEY=APPKEY,", LORA_API_KEY);
+    char *class_command = str_concat("AT+CLASS=", LORA_CLASS);
+    char *port_command = str_concat("AT+PORT=", LORA_PORT);
+    char *join_command = str_concat("AT+JOIN", "");
 
-    char mode[10] = "LWOTAA";
-    char class[10] = "A";
-    char port[10] = "8";
-
-    strncat(mode_command, mode, sizeof(mode_command) - strlen(mode_command) - 1);
-    strncat(key_command, LORA_API_KEY, sizeof(key_command) - strlen(key_command) - 1);
-    strncat(class_command, class, sizeof(class_command) - strlen(class_command) - 1);
-    strncat(port_command, port, sizeof(port_command) - strlen(port_command) - 1);
-
-    const LoraCommand connection_commands[CONNECTION_COMMAND_COUNT] = {
+    const LoraCommand CONNECTION_CMDS[CONNECTION_COMMAND_COUNT] = {
         { at_command, "+AT: OK", 500 },
         { mode_command, "+MODE",  500 },
         { key_command, "+KEY: APPKEY", 500 },
@@ -100,15 +93,20 @@ bool connect_to_lora_module()
 
     while (curr_cmd_i < CONNECTION_COMMAND_COUNT)
     {
+        if (!CONNECTION_CMDS[curr_cmd_i].command) {
+            connection_succeeded = false;
+            break;
+        }
+
         char res[MAX_RESULT_SIZE];
 
-        printf("Sending: %s\n", connection_commands[curr_cmd_i].command);
+        printf("Sending: %s\n", CONNECTION_CMDS[curr_cmd_i].command);
 
         connection_succeeded = send_command(
-            connection_commands[curr_cmd_i].command,
-            connection_commands[curr_cmd_i].result,
+            CONNECTION_CMDS[curr_cmd_i].command,
+            CONNECTION_CMDS[curr_cmd_i].result,
             res,
-            connection_commands[curr_cmd_i].timeout_ms
+            CONNECTION_CMDS[curr_cmd_i].timeout_ms
         );
 
         if (connection_succeeded) {
@@ -124,6 +122,10 @@ bool connect_to_lora_module()
                 break;
             }
         }
+    }
+
+    for (size_t i = 0; i < CONNECTION_COMMAND_COUNT; i++) {
+        free(CONNECTION_CMDS[i].command);
     }
     
     return connection_succeeded;
