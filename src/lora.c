@@ -19,14 +19,13 @@
 
 typedef struct LoraCommand {
     char *command;
-    char *result;
+    char *expected_result;
     uint32_t timeout_ms;
 } LoraCommand;
 
 
-bool send_command(
+static void send_command(
     const char *command,
-    const char *expected_result,
     char *result_buffer,
     uint32_t timeout_ms
 )
@@ -45,17 +44,7 @@ bool send_command(
             break;
         }
     }
-
     result_buffer[result_position] = '\0';
-
-    if (strstr(result_buffer, "ERROR") != NULL) {
-        return false;
-    }
-
-    if (strstr(result_buffer, expected_result) != NULL) {
-        return true;
-    }
-    return false;
 }
 
 
@@ -98,27 +87,31 @@ bool connect_to_lora_module()
             break;
         }
 
-        char res[MAX_RESULT_SIZE];
+        char result[MAX_RESULT_SIZE];
 
         printf("Sending: %s\n", connectiond_cmds[curr_cmd_i].command);
 
-        connection_succeeded = send_command(
+        send_command(
             connectiond_cmds[curr_cmd_i].command,
-            connectiond_cmds[curr_cmd_i].result,
-            res,
+            result,
             connectiond_cmds[curr_cmd_i].timeout_ms
         );
 
-        if (connection_succeeded) {
-            printf("Success: %s\n", res);
+        if (strstr(result, connectiond_cmds[curr_cmd_i].expected_result) != NULL) {
+            printf("%s", result);
+            printf("Success: %s\n\n", connectiond_cmds[curr_cmd_i].command);
             curr_cmd_i++;
+            connection_succeeded = true;
         } else {
+            connection_succeeded = false;
+
             if (curr_cmd_i == 5 && join_command_attempts < 3) {
                 join_command_attempts++;
                 curr_cmd_i = 5;
                 printf("Join command failed attempt %d. Retrying...\n", join_command_attempts);
-            } else {        
-                printf("ERROR: %s\n", res);
+            } else {
+                printf("%s", result);
+                printf("Failed: %s\n\n",  connectiond_cmds[curr_cmd_i].command);
                 break;
             }
         }
@@ -131,5 +124,41 @@ bool connect_to_lora_module()
     return connection_succeeded;
 }
 
+bool send_message(const char *message)
+{
+    if (!message) {
+        printf("Message sent to LoRa cant be empty\n");
+        return false;
+    }
 
+    size_t message_len = strlen(message);
+    size_t quoted_message_len = message_len + 3;
+
+    char *quoted_message = (char *)malloc(quoted_message_len + 1);
+    if (!quoted_message) {
+        printf("Internal error\n");
+        return false;
+    }
+
+    quoted_message[0] = '"';
+    memcpy(quoted_message + 1, message, message_len);
+    quoted_message[message_len + 1] = '"';
+    quoted_message[message_len + 2] = '\0';
+
+    char *msg_command = str_concat("AT+MSG=", quoted_message);
+    free(quoted_message);
+
+    if (!msg_command) {
+        printf("Error creating msg command.\n");
+        return false;
+    }
+
+    printf("Sending: %s\n", msg_command);
+
+    char result[MAX_RESULT_SIZE];
+    send_command(msg_command, result, 10000 /* wait response for 10 seconds */);
+    printf("%s\n", result);
+
+    return strstr(result, "+MSG: Done") != NULL;
+}
 
