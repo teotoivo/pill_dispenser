@@ -1,6 +1,8 @@
 #include "utils.h"
 
 #include <hardware/i2c.h>
+#include <hardware/sync.h>
+#include <hardware/watchdog.h>
 #include <pico/error.h>
 #include <pico/stdio.h>
 #include <pico/stdlib.h>
@@ -9,6 +11,18 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+
+void restart_board(void)
+{
+	// Enable watchdog with a short timeout (1ms)
+	watchdog_enable(1, 1);
+
+	// Wait for the watchdog to trigger reset
+	while (1)
+	{
+		__wfi();
+	}
+}
 
 void init_led_pin(uint8_t pin)
 {
