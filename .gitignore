@@ -9,3 +9,7 @@
 .idea/
 .cache/
 .clangd
+
+
+# API KEY
+/include/lora_api_key.h

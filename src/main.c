@@ -11,6 +11,7 @@
 #include "program_state.h"
 #include "stepper_motor.h"
 #include "utils.h"
+#include "lora.h"
 
 void irq_callback(uint gpio, uint32_t event_mask)
 {
@@ -45,6 +46,16 @@ int main()
 	init_stepper_motor(&program_state);
 	init_leds(LED_COUNT);
 	init_buttons(BUTTON_COUNT);
+
+	// Program is on connecting to lora
+	gpio_put(LED_D2, true);
+
+	bool connected_to_lora = connect_to_lora_module();
+	if (connected_to_lora) {
+		// Connected to lora
+		send_message("BOOT");
+		gpio_put(LED_D2, false);
+	}
 
 	// dont move this
 	load_program_state(&program_state);

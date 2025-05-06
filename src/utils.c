@@ -10,6 +10,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 void restart_board(void)
 {
@@ -92,4 +93,30 @@ bool get_user_input(char *input, size_t input_size)
 
 	input[i] = '\0';
 	return true;
+}
+
+char *str_concat(const char *str1, const char *str2)
+{
+	if (!str1 || !str2) {
+		return NULL;
+	}
+
+	size_t len1 = strlen(str1);
+	size_t len2 = strlen(str2);
+
+	char *result = (char *)malloc((len1 + len2) + 1);
+	if (!result) {
+		return NULL;
+	}
+
+	uint32_t pos = 0;
+	for (size_t i = 0; i < len1; i++) {
+		result[pos++] = str1[i];
+	}
+	for (size_t j = 0; j < len2; j++) {
+		result[pos++] = str2[j];
+	}
+	result[pos] = '\0';
+
+	return result;
 }
