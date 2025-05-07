@@ -8,6 +8,12 @@
 
 #define CALIBRATION_RUNS 1
 
+/* Maximum time (ms) we wait for a pill to reach the piezo sensor */
+#define PILL_DROP_TIMEOUT_MS 1500
+
+/* How many times to blink error LED when dispensing fails */
+#define ERROR_BLINK_COUNT 5U
+
 /**
  * initializes everything needed for the stepper motor
  * main still needs to set interrupt callback
@@ -32,4 +38,8 @@ void calibarate_stepper_motor(ProgramState *program_state);
 
 void dispense_next_pill(ProgramState *program_state);
 
+void piezo_interrupt_callback(uint32_t event_mask);
+
+void dispense_next_pill_with_confirmation(ProgramState *program_state,
+										  uint8_t tries);
 #endif	// !STEPPER_MOTOR_H

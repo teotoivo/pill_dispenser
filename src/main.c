@@ -23,6 +23,9 @@ void irq_callback(uint gpio, uint32_t event_mask)
 		case SW_1:
 			button_interrupt_callback(event_mask);
 			break;
+		case PIEZO_SENSOR:
+			piezo_interrupt_callback(event_mask);
+			break;
 	}
 }
 
@@ -60,6 +63,8 @@ int main()
 									   &irq_callback);
 	gpio_set_irq_enabled_with_callback(SW_1, GPIO_IRQ_EDGE_RISE, true,
 									   &irq_callback);
+	gpio_set_irq_enabled_with_callback(PIEZO_SENSOR, GPIO_IRQ_EDGE_FALL, true,
+									   &irq_callback);
 
 	ProgramState program_state;
 
@@ -69,6 +74,7 @@ int main()
 	init_stepper_motor(&program_state);
 	init_leds(LED_COUNT);
 	init_buttons(BUTTON_COUNT);
+	init_button_pin(PIEZO_SENSOR);
 
 	// Program is on connecting to lora
 	gpio_put(LED_D2, true);
