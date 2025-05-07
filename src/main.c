@@ -36,6 +36,7 @@ void main_things(ProgramState *program_state)
 
 	if (program_state->is_running == 1)
 	{
+		send_message("MID RUN RESER??????", program_state->is_lora_connected);
 		reset_stepper_motor_offset(program_state);
 	}
 	if (program_state->steps_per_rev == 0)
@@ -47,8 +48,8 @@ void main_things(ProgramState *program_state)
 
 	while (true)
 	{
-		dispense_next_pill(program_state);
-		sleep_ms(30 * 100);	 // 30 sec
+		dispense_next_pill_with_confirmation(program_state, 0);
+		sleep_ms(30 * 1000);  // 30 sec
 	}
 }
 
@@ -79,13 +80,8 @@ int main()
 	// Program is on connecting to lora
 	gpio_put(LED_D2, true);
 
-	bool connected_to_lora = connect_to_lora_module();
-	if (connected_to_lora)
-	{
-		// Connected to lora
-		send_message("BOOT");
-		gpio_put(LED_D2, false);
-	}
+	program_state.is_lora_connected = connect_to_lora_module();
+	send_message("BOOT", program_state.is_lora_connected);
 
 	main_things(&program_state);
 }

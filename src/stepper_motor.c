@@ -8,6 +8,7 @@
 #include <stdlib.h>
 
 #include "hardware_definitions.h"
+#include "lora.h"
 #include "program_state.h"
 #include "utils.h"
 
@@ -206,6 +207,7 @@ void dispense_next_pill(ProgramState *program_state)
 		program_state->steps_per_rev		   = 0;
 		printf("restart\n");
 		write_program_state(program_state);
+		send_message("PILL EMPTY", program_state->is_lora_connected);
 		main_things(program_state);
 	}
 
@@ -262,7 +264,12 @@ void dispense_next_pill_with_confirmation(ProgramState *program_state,
 
 	if (!pill_detected)
 	{
+		send_message("NOT DISPENSED", program_state->is_lora_connected);
 		blink_error_led();
 		dispense_next_pill_with_confirmation(program_state, tries + 1);
+	}
+	else
+	{
+		send_message("DISPENSED", program_state->is_lora_connected);
 	}
 }
