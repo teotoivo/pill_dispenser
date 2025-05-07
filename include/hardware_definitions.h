@@ -16,7 +16,7 @@
 #define SW_1 8
 #define SW_2 7
 
-#define OPTO_FORK 28 // Input with pullup
+#define OPTO_FORK 28  // Input with pullup
 
 #define STEPPER_CONTROLLER_0 2
 #define STEPPER_CONTROLLER_1 3
@@ -34,4 +34,4 @@
 #define EEPROM_sda_pin 16
 #define EEPROM_scl_pin 17
 
-#endif // !HARDWARE_DEFINITIONS_H
+#endif	// !HARDWARE_DEFINITIONS_H

@@ -203,7 +203,7 @@ void dispense_next_pill(ProgramState *program_state)
 		program_state->steps_per_rev		   = 0;
 		printf("restart\n");
 		write_program_state(program_state);
-		restart_board();
+		main_things(program_state);
 	}
 
 	program_state->is_running = 0;

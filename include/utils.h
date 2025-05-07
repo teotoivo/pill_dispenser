@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 #include "pico/stdlib.h"
+#include "program_state.h"
 
 void init_button_pin(uint8_t pin);
 void init_led_pin(uint8_t pin);
@@ -15,4 +16,5 @@ bool get_user_input(char *input, size_t input_size);
 void restart_board(void);
 char *str_concat(const char *str1, const char *str2);
 
+void main_things(ProgramState *program_state);
 #endif

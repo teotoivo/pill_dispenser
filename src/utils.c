@@ -9,20 +9,10 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
-void restart_board(void)
-{
-	// Enable watchdog with a short timeout (1ms)
-	watchdog_enable(1, 1);
-
-	// Wait for the watchdog to trigger reset
-	while (1)
-	{
-		__wfi();
-	}
-}
+#include "program_state.h"
 
 void init_led_pin(uint8_t pin)
 {
@@ -97,23 +87,27 @@ bool get_user_input(char *input, size_t input_size)
 
 char *str_concat(const char *str1, const char *str2)
 {
-	if (!str1 || !str2) {
+	if (!str1 || !str2)
+	{
 		return NULL;
 	}
 
 	size_t len1 = strlen(str1);
 	size_t len2 = strlen(str2);
 
-	char *result = (char *)malloc((len1 + len2) + 1);
-	if (!result) {
+	char *result = (char *) malloc((len1 + len2) + 1);
+	if (!result)
+	{
 		return NULL;
 	}
 
 	uint32_t pos = 0;
-	for (size_t i = 0; i < len1; i++) {
+	for (size_t i = 0; i < len1; i++)
+	{
 		result[pos++] = str1[i];
 	}
-	for (size_t j = 0; j < len2; j++) {
+	for (size_t j = 0; j < len2; j++)
+	{
 		result[pos++] = str2[j];
 	}
 	result[pos] = '\0';

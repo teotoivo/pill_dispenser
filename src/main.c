@@ -8,10 +8,10 @@
 #include "eeprom.h"
 #include "hardware_definitions.h"
 #include "initial.h"
+#include "lora.h"
 #include "program_state.h"
 #include "stepper_motor.h"
 #include "utils.h"
-#include "lora.h"
 
 void irq_callback(uint gpio, uint32_t event_mask)
 {
@@ -23,6 +23,29 @@ void irq_callback(uint gpio, uint32_t event_mask)
 		case SW_1:
 			button_interrupt_callback(event_mask);
 			break;
+	}
+}
+
+void main_things(ProgramState *program_state)
+{
+	// dont move this
+	load_program_state(program_state);
+
+	if (program_state->is_running == 1)
+	{
+		reset_stepper_motor_offset(program_state);
+	}
+	if (program_state->steps_per_rev == 0)
+	{
+		wait_for_calibration();
+		calibarate_stepper_motor(program_state);
+		wait_for_start();
+	}
+
+	while (true)
+	{
+		dispense_next_pill(program_state);
+		sleep_ms(30 * 100);	 // 30 sec
 	}
 }
 
@@ -51,29 +74,12 @@ int main()
 	gpio_put(LED_D2, true);
 
 	bool connected_to_lora = connect_to_lora_module();
-	if (connected_to_lora) {
+	if (connected_to_lora)
+	{
 		// Connected to lora
 		send_message("BOOT");
 		gpio_put(LED_D2, false);
 	}
 
-	// dont move this
-	load_program_state(&program_state);
-
-	if (program_state.is_running == 1)
-	{
-		reset_stepper_motor_offset(&program_state);
-	}
-	if (program_state.steps_per_rev == 0)
-	{
-		wait_for_calibration();
-		calibarate_stepper_motor(&program_state);
-		wait_for_start();
-	}
-
-	while (true)
-	{
-		dispense_next_pill(&program_state);
-		sleep_ms(30 * 100);	 // 30 sec
-	}
+	main_things(&program_state);
 }
