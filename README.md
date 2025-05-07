@@ -30,13 +30,13 @@
 ![flow_chart](./images/flow_chart.png)
 
 
-## Work divided
+## Work divide
   * Teo Maximilien
     * stepper motor logic
     * program state and eeprom logic
     * pill dispening logic
     * Documentation
-  * Aleksi Noro
+  * Aleski Noro
     * lorawan
     * main program logic at start
     * Documentation
