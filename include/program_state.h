@@ -1,6 +1,7 @@
 #ifndef PROGRAM_STATE_H
 #define PROGRAM_STATE_H
 #include <stdint.h>
+#include <stdbool.h>
 typedef struct ProgramState
 {
 	uint16_t steps_per_rev;
