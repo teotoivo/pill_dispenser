@@ -1,4 +1,4 @@
-# Pill Dispenser
+# Pill Dispenser a REVOLUTIONARY medical device
 
 ## Introduction
 
@@ -12,21 +12,22 @@
 * The device could be especially useful in context of elderly care
 
 ## Description of software
-1. Boot
-  * initialises all pins and connections
-  * tries connecting to lorawan network
-  * loads program state from eeprom
-2. main program
-  * checks if program was reset mid turning and if so resets to the correct position
-  * checks if program has been calibrated
-    * if hasnt been calibrated waits for user to press button before calibrating
-  * waits for user to load pills and press start button
-3. Pill dispense loop
-  * turns one slot forwared then waits for 1.5s for a pill to drop
-    * if no pill was dropped it tries again until a pill is dropped or its empty
-  * if last pill is dispensed program goes back to step 2. and recalibrates
+* **1. Boot**
+  * Initialises all pins and connections
+  * Tries connecting to lorawan network
+  * Loads program state from eeprom
+* **2. Main program**
+  * Checks if program was reset mid turning and if so resets to the correct position
+  * Checks if program has been calibrated
+    * If hasnt been calibrated waits for user to press button before calibrating
+  * Waits for user to load pills and press start button
+* **3. Pill dispense loop**
+  * Turns one slot forwared then waits for 1.5s for a pill to drop
+    * If no pill was dropped it tries again until a pill is dropped or its empty
+  * If last pill is dispensed program goes back to step 2. and recalibrates
 
-
+## Flow chart of software
+![flow_chart](./images/flow_chart.png)
 
 
 ## Work divide
@@ -34,6 +35,8 @@
     * stepper motor logic
     * program state and eeprom logic
     * pill dispening logic
+    * Documentation
   * Aleski Noro
     * lorawan
     * main program logic at start
+    * Documentation
