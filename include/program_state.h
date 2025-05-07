@@ -7,6 +7,7 @@ typedef struct ProgramState
 	uint16_t absolute_motor_position;
 	uint8_t is_running;	 // 0 for no 1 for yes
 	uint8_t current_pill;
+	bool is_lora_connected;
 } ProgramState;
 
 /* --------------------------------------------------------------------

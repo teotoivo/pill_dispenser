@@ -11,7 +11,6 @@
 #define LORA_PORT "8"
 
 bool connect_to_lora_module();
-bool send_message(const char *message);
-
+bool send_message(const char *message, bool connected);
 
 #endif

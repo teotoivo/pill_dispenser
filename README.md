@@ -1,65 +1,39 @@
 # Pill Dispenser
 
-## Instructions
-* use the provided .clang-format for formatting
-1. Clone the repository
-```bash
-git clone git@github.com:teotoivo/pill_dispenser.git
-```
+## Introduction
 
-2. Create new branch
-```bash
-git checkout -b branch-name
-```
+### Projects goals
+* The goal of the project is to have a device that dispenses the user a pill once a day
+* The device waits for user to start calibration and after calibration to load the pills after the user has loaded pill and pressed the button it starts dispensing the pills
+* The device checks that the pill has been dispensed and if no pill has been dispensed it provides the user feedback trough the led and tries again until a pill is dispensed or its empty
 
-3. Add a feature / make changes
-* Add files changed
-```bash
-git add .
-```
-* Commit changes IMPORTANT USE GOOD COMMIT MESSAGES
-```bash
-git commit -m "Good commit message"
-```
-* push changes
-```bash
-git push origin branch-name
-```
+### The value of our project
+* It helps people remember to take their medication by giving it straight to them
+* The device could be especially useful in context of elderly care
 
-4. Before creating a pull request make sure the code is up to date
-* switch branch to main
-```bash
-git checkout main
-```
-* Pull latest changes
-```bash
-git pull origin main
-```
-* switch back to your branch
-```bash
-git checkout branch-name
-```
-* merge the changes
-```bash
-git merge main
-```
-* the readd and commit and push before making the pull request
+## Description of software
+1. Boot
+  * initialises all pins and connections
+  * tries connecting to lorawan network
+  * loads program state from eeprom
+2. main program
+  * checks if program was reset mid turning and if so resets to the correct position
+  * checks if program has been calibrated
+    * if hasnt been calibrated waits for user to press button before calibrating
+  * waits for user to load pills and press start button
+3. Pill dispense loop
+  * turns one slot forwared then waits for 1.5s for a pill to drop
+    * if no pill was dropped it tries again until a pill is dropped or its empty
+  * if last pill is dispensed program goes back to step 2. and recalibrates
 
-5. Open a pull request
-Once your branch is pushed to GitHub, follow these steps to create a pull request:
-* Go to the GitHub repository.
-* You should see a notification suggesting that your branch was pushed. Click the Compare & Pull Request button.
-* In the PR description, explain the changes you made and why they’re important.
-* Select the base branch as main (we’ll be merging your changes into this branch).
-* Click Create Pull Request.
 
-## resolving merge conflicts
-* Git will alert if there are merge conflicts go and fix the files with conflicts
-* then commit them
-```bash
-git add .
-git commit -m "Resolved merge conflicts"
-```
 
-## IMPORTANT
-* Pushing to main is disabled do not push to main
+
+## Work divide
+  * Teo Maximilien
+    * stepper motor logic
+    * program state and eeprom logic
+    * pill dispening logic
+  * Aleski Noro
+    * lorawan
+    * main program logic at start
