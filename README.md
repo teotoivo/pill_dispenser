@@ -40,6 +40,3 @@
     * lorawan
     * main program logic at start
     * Documentation
-  * Pavel Lehto
-    * Modified and improved certain sections of code logic
-    * Documentation
