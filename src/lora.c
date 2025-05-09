@@ -130,15 +130,26 @@ bool connect_to_lora_module()
 	return connection_succeeded;
 }
 
-bool send_message(const char *message, bool connected)
+bool send_message(bool connected, const char *fmt, ...)
 {
 	if (!connected)
 	{
 		return false;
 	}
-	if (!message)
+	if (!fmt)
 	{
 		printf("Message sent to LoRa cant be empty\n");
+		return false;
+	}
+
+	char message[512];
+	va_list args;
+	va_start(args, fmt);
+	vsnprintf(message, sizeof(message), fmt, args);
+	va_end(args);
+
+	if (strlen(message) == 0) {
+		printf("Error formating message\n");
 		return false;
 	}
 
