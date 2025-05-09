@@ -207,7 +207,7 @@ void dispense_next_pill(ProgramState *program_state)
 		program_state->steps_per_rev		   = 0;
 		printf("restart\n");
 		write_program_state(program_state);
-		send_message("PILL EMPTY", program_state->is_lora_connected);
+		send_message(program_state->is_lora_connected, "PILL EMPTY");
 		main_things(program_state);
 	}
 
@@ -264,12 +264,12 @@ void dispense_next_pill_with_confirmation(ProgramState *program_state,
 
 	if (!pill_detected)
 	{
-		send_message("NOT DISPENSED", program_state->is_lora_connected);
+		send_message(program_state->is_lora_connected, "NOT DISPENSED");
 		blink_error_led();
 		dispense_next_pill_with_confirmation(program_state, tries + 1);
 	}
 	else
 	{
-		send_message("DISPENSED", program_state->is_lora_connected);
+		send_message(program_state->is_lora_connected, "DISPENSED %u", program_state->current_pill);
 	}
 }
