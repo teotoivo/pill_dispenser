@@ -190,7 +190,7 @@ void opto_fork_interrupt_callback(uint32_t event_mask)
 	}
 }
 
-void dispense_next_pill(ProgramState *program_state)
+bool dispense_next_pill(ProgramState *program_state)
 {
 	program_state->is_running = 1;
 	write_program_state(program_state);
@@ -198,21 +198,19 @@ void dispense_next_pill(ProgramState *program_state)
 	run_stepper_steps(program_state, program_state->steps_per_rev / PILL_SLOTS,
 					  false);
 
+	bool restart = false;
+
 	program_state->current_pill += 1;
-	if (program_state->current_pill == PILL_SLOTS - 1)
+	if (program_state->current_pill >= PILL_SLOTS - 1)
 	{
-		program_state->current_pill			   = 0;
-		program_state->is_running			   = 0;
-		program_state->absolute_motor_position = 0;
-		program_state->steps_per_rev		   = 0;
-		printf("restart\n");
+		restart = true;
+	} else {
+		program_state->is_running = 0;
 		write_program_state(program_state);
-		send_message("PILL EMPTY", program_state->is_lora_connected);
-		main_things(program_state);
 	}
 
-	program_state->is_running = 0;
-	write_program_state(program_state);
+	return restart;
+
 }
 
 void piezo_interrupt_callback(uint32_t event_mask)
@@ -258,18 +256,41 @@ void dispense_next_pill_with_confirmation(ProgramState *program_state,
 	uint8_t dummy;
 	while (queue_try_remove(&piezo_events, &dummy));
 
-	dispense_next_pill(program_state);
+	bool restart = dispense_next_pill(program_state);
 
 	const bool pill_detected = wait_for_piezo_event(PILL_DROP_TIMEOUT_MS);
 
 	if (!pill_detected)
 	{
-		send_message("NOT DISPENSED", program_state->is_lora_connected);
+
+		send_message(
+			program_state->is_lora_connected,
+			"PILL SLOT: %u --- NOT DISPENSED%s",
+			program_state->current_pill,
+			restart ? ". DISPENSER EMPTY" : ""
+		);
 		blink_error_led();
-		dispense_next_pill_with_confirmation(program_state, tries + 1);
+		if (!restart) {
+			dispense_next_pill_with_confirmation(program_state, tries + 1);
+		}
 	}
 	else
 	{
-		send_message("DISPENSED", program_state->is_lora_connected);
+		send_message(
+			program_state->is_lora_connected, 
+			"PILL SLOT: %u --- DISPENSED%s",
+			program_state->current_pill,
+			restart ? ". DISPENSER EMPTY" : ""
+		);
+	}
+
+	if (restart) {
+		program_state->current_pill			   = 0;
+		program_state->is_running			   = 0;
+		program_state->absolute_motor_position = 0;
+		program_state->steps_per_rev		   = 0;
+		printf("restart\n");
+		write_program_state(program_state);
+		main_things(program_state);
 	}
 }

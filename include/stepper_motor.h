@@ -36,7 +36,7 @@ void reset_stepper_motor_offset(ProgramState *program_state);
 
 void calibarate_stepper_motor(ProgramState *program_state);
 
-void dispense_next_pill(ProgramState *program_state);
+bool dispense_next_pill(ProgramState *program_state);
 
 void piezo_interrupt_callback(uint32_t event_mask);
 
